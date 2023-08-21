@@ -31,17 +31,64 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+                "src/styles.scss",
+                {
+                    "input": "src/assets/themes/theme-bootstrap-dark-blue.css",
+                    "bundleName": "theme-bs-dark-blue",
+                    "inject": false
+                },
+                {
+                    "input": "src/assets/themes/theme-bootstrap-light-blue.css",
+                    "bundleName": "theme-bs-light-blue",
+                    "inject": false
+                },
+                {
+                    "input": "src/assets/themes/theme-lara-dark-teal.css",
+                    "bundleName": "theme-lara-dark-teal",
+                    "inject": false
+                },
+                {
+                    "input": "src/assets/themes/theme-lara-light-teal.css",
+                    "bundleName": "theme-lara-light-teal",
+                    "inject": false
+                },
+                {
+                    "input": "src/assets/themes/theme-viva-dark.css",
+                    "bundleName": "theme-viva-dark",
+                    "inject": false
+                },
+                {
+                    "input": "src/assets/themes/theme-viva-light.css",
+                    "bundleName": "theme-viva-light",
+                    "inject": false
+                },
+                {
+                    "input": "src/assets/themes/theme-nova.css",
+                    "bundleName": "theme-nova",
+                    "inject": false
+                },
+                {
+                    "input": "src/assets/themes/theme-rhea.css",
+                    "bundleName": "theme-rhea",
+                    "inject": false
+                }
+
             ],
-            "scripts": []
+
+
+
+
+            "scripts": [
+                
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "2.2mb",
+                  "maximumError": "2.5mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -106,6 +153,5 @@
         }
       }
     }
-  },
-  "defaultProject": "estimator-client2"
+  }
 }

@@ -1,0 +1,81 @@
+<p-toast></p-toast>
+<p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+        <button pButton pRipple label="Save" icon="pi pi-plus" class="p-button-success mr-2" (click)="saveCompany()"></button>
+    </ng-template>
+</p-toolbar>
+
+<div class="flex align-items-center justify-content-between surface-100 py-3">
+    <div class="page-title ml-6">Manage Company Information</div>
+    <span class="p-input-icon-left"></span>
+</div>
+
+<div class="card px-8">
+    <div class="formgrid grid px-8 py-6">
+        <div class="field col-12 md:col-9 col-offset-1">
+            <label for="company">Company Name</label>
+            <input id="company" [(ngModel)]="company.companyName" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+        </div>
+        <div class="field col-12 md:col-9 col-offset-1">
+            <label for="address">Street Address</label>
+            <input id="address" [(ngModel)]="company.address" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+        </div>
+
+        <div class="field col-12 md:col-5 col-offset-1">
+            <label for="city">City</label>
+            <input id="city" [(ngModel)]="company.city" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+        </div>
+        <div class="field col-12 md:col-2 px-4">
+            <label for="state">State</label>
+            <select id="state" [(ngModel)]="company.state" class="w-full text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round outline-none focus:border-primary" style="appearance: auto">
+                <option>OR</option>
+                <option>ID</option>
+                <option>WA</option>
+            </select>
+        </div>
+        <div class="field col-12 md:col-2 px-4">
+            <label for="zip">Zip</label>
+            <input id="zip"  [(ngModel)]="company.zipCode" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+        </div>
+        <div class="field col-12 md:col-5 col-offset-1">
+            <label for="zip">Primary Email</label>
+            <input id="zip" [(ngModel)]="company.email1" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+        </div>
+        <div class="field col-12 md:col-5 px-8">
+            <label for="zip">Secondary Email</label>
+            <input id="zip" [(ngModel)]="company.email2" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+        </div>
+        <div class="field col-12 md:col-5 col-offset-1">
+            <label for="phone1">Primary Phone</label><br/>
+            <p-inputMask 
+                mask="(999) 999-9999" 
+                id="phone1" 
+                [(ngModel)]="company.phone1"
+                class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+            </p-inputMask>
+        </div>
+        <div class="field col-12 md:col-5 px-8">
+            <label for="phone2">Secondary Phone</label><br/>
+            <p-inputMask 
+                mask="(999) 999-9999" 
+                id="phone2" 
+                [(ngModel)]="company.phone2"
+                class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
+            </p-inputMask>
+        </div>
+        <div class="field col-12 md:col-3 col-offset-1">
+            <label for="adminPercent">Default Admin Percentage</label><br/>
+            <p-inputNumber id="adminPercent" pInput [(ngModel)]="company.adminPercent"  inputId="percent" prefix="%" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"></p-inputNumber>
+        </div>
+        <div class="field col-12 md:col-9 col-offset-1">
+        </div>
+        <div class="field col-12 md:col-5 col-offset-1">
+            <label for="adminMessage">Administration Description (no line breaks)</label><br/>
+            <textarea id="adminMessage" [rows]="8" [cols]="60" pInputTextarea [(ngModel)]="company.adminMessage"></textarea>
+        </div>
+        <div class="field col-12 md:col-5 col-offset-1">
+            <label for="disclaimer">Disclaimer (no line breaks)</label><br/>
+            <textarea id="disclaimer" [rows]="8" [cols]="60" pInputTextarea [(ngModel)]="company.disclaimer"></textarea>
+        </div>
+    </div>
+</div>

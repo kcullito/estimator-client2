@@ -1,0 +1,169 @@
+<div class="card" id="productCard">
+
+    <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNewProduct()"></button>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <div class="flex">
+            </div>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt 
+        [value]="products" 
+        [rows]="10" 
+        [paginator]="true" 
+        [globalFilterFields]="['brandName','name','description','price','dimensions']"
+        styleClass="p-datatable-sm"
+        [rowHover]="true" 
+        dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+        [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+                <div class="page-title">Manage Products</div>
+                <span class="p-input-icon-left ml-auto">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="applyFilterGlobal($event, 'contains')" placeholder="Filter" />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th></th>
+                <th pSortableColumn="brandName">Brand <p-sortIcon field="brandId"></p-sortIcon></th>
+                <th pSortableColumn="name">Product Name<p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
+                <th pSortableColumn="price">Price <p-sortIcon field="price"></p-sortIcon></th>
+                <th pSortableColumn="dimensions">Dimensions <p-sortIcon field="dimensions"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-product let-expanded="expanded">
+            <tr>
+                <td>
+                </td>
+                <td>{{product.brandName}}</td>
+                <td>{{product.name}}</td>
+                <td>{{product.description}}</td>
+                <td>{{product.price | currency}}</td>
+                <td>{{product.dimensions}}</td>
+                <td>
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="Edit Survey"
+                        icon="pi pi-pencil" 
+                        class="p-button-rounded p-button-success mr-2" 
+                        (click)="editProduct(product)">
+                    </button>
+                    <!--
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="View Survey"
+                        icon="pi pi-eye" 
+                        class="p-button-rounded p-button-warning mr-2" 
+                        (click)="viewPro(product)">
+                    </button> -->
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="Delete Survey"
+                        icon="pi pi-trash" 
+                        class="p-button-rounded p-button-danger" 
+                        (click)="deleteProduct(product)">
+                    </button>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between" *ngIf="products.length === 1">
+                In total there is {{products ? products.length : 0 }} product
+            </div>
+            <div class="flex align-items-center justify-content-between" *ngIf="products.length === 0 || products.length > 1">
+                In total there are {{products ? products.length : 0 }} products
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- Survey Dialog -->
+
+<p-dialog 
+[(visible)]="productDialog" 
+[style]="{width: '400px'}" 
+header="Product Details" 
+[modal]="true"
+styleClass="p-fluid formgrid">
+
+<ng-template pTemplate="content">
+<div class="card">
+    <div class="formgrid grid">
+        <div class="field col-12 md:col-12">
+            <label>Product Name</label>
+            <input 
+                class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                type="text" 
+                id="ame" 
+                name="name" 
+                pInputText
+                [(ngModel)]="product.name" 
+                required />
+        </div>
+        <div class="field col-12 md:col-12">
+            <label>Brand</label>
+            <p-dropdown 
+                [options]="productBrands" 
+                [(ngModel)]="product.brandId" 
+                placeholder="Select a Brand" 
+                optionLabel="name"
+                optionValue="id"
+                appendTo="body">
+            </p-dropdown>
+        </div>
+        <div class="field col-12 md:col-12">
+            <label>Description</label>
+            <input 
+                class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                type="text" 
+                id="description" 
+                name="description" 
+                pInputText
+                [(ngModel)]="product.description" 
+                required />
+        </div>
+        <div class="field col-12 md:col-6">
+            <label>Price</label>
+            <input 
+                class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                type="text" 
+                id="price" 
+                name="price" 
+                pInputText
+                [(ngModel)]="product.price" 
+                required />
+        </div>
+        <div class="field col-12 md:col-6">
+            <label>Product Dimensions</label>
+            <input 
+                class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                type="text" 
+                id="dimensions" 
+                name="dimensions" 
+                pInputText
+                [(ngModel)]="product.dimensions" 
+                required />
+        </div>
+    </div>
+</div>
+</ng-template>
+
+<ng-template pTemplate="footer">
+<button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideProductDialog()"></button>
+<button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="validateProductForm()"></button>
+</ng-template>
+</p-dialog>
+

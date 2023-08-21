@@ -1,0 +1,624 @@
+<p-toast></p-toast>
+<div class="card">
+
+    <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <button 
+                pButton 
+                pRipple 
+                label="Save" 
+                icon="pi pi-save" 
+                title="Save Estimate" 
+                class="p-button-success mr-2" 
+                (click)="saveEstimate()">
+            </button>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <button 
+                pButton 
+                pRipple 
+                label="Create" 
+                icon="pi pi-file" 
+                title="Generate Estimate" 
+                class="p-button-warning mr-2"      
+                (click)="createEstimate(estimate, estimate.currentVersion)">
+            </button>
+        </ng-template>
+    </p-toolbar>
+
+    <div class="surface-card">
+        <h2 class="p-3 m-0">{{pageTitle}}</h2>
+    </div>
+    <div class="surface-100">
+        <table>
+            <tr>
+                <td>
+                    <!-- customer dropdown -->
+                    <p-dropdown class="ml-3 mr-3"
+                        [options]="customers" 
+                        [(ngModel)]="selectedCustomer" 
+                        optionLabel="lastName" 
+                        placeholder="Select Customer" 
+                        (onChange) = "customerChanged($event)">
+                        <ng-template pTemplate="selectedItem">
+                            <div class="country-item country-item-value" *ngIf="selectedCustomer">
+                                <div>{{selectedCustomer.displayName}}</div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-customer pTemplate="customer">
+                            <div class="country-item">
+                                <div>{{customer.displayName}}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                    <small 
+                        class="p-error block" 
+                        *ngIf="submitted && (selectedCustomer.id === undefined || selectedCustomer.id < 1)">Customer is required
+                    </small>
+                </td>
+                <td>
+                    <!-- estimate type dropdown -->
+                    <p-dropdown class="mr-3"
+                        [options]="estimateTypes" 
+                        optionLabel="name" 
+                        optionValue="id" 
+                        [(ngModel)]="estimate.estimateTypeId"
+                        placeholder="Select Estimate Type"
+                        (onChange) = "estimateTypeChanged($event)">
+                    </p-dropdown>
+                    <small 
+                        class="p-error block" 
+                        *ngIf="submitted && (estimate.estimateTypeId === undefined || estimate.estimateTypeId < 1)">Estimate type is required
+                    </small>
+                </td>
+                <td>
+                    <!-- estimate status dropdown -->
+                    <p-dropdown class="mr-3"
+                        [options]="estimateStatuses" 
+                        [(ngModel)]="estimateDetail.statusId" 
+                        optionLabel="statusName" 
+                        optionValue="id" 
+                        placeholder="Select Estimate Status"
+                        (onChange) = "estimateStatusChanged($event)">
+                    </p-dropdown>
+                </td>
+                <td>
+                    <!-- estimate version dropdown -->
+                    Version: 
+                    <p-dropdown class="mr-3"
+                        [options]="estimateVersions" 
+                        [(ngModel)]="selectedVersion"
+                        placeholder="Select Version"
+                        (onChange) = "estimateVersionChanged($event)">
+                    </p-dropdown>
+                </td>
+                <td>
+                    <!-- new version button -->
+                    <button 
+                        pButton 
+                        pRipple 
+                        icon="pi pi-plus-circle" 
+                        class="p-button-success" 
+                        title="Add New Version"
+                        (click)="addNewVersion()">
+                    </button> 
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <div center class="card" pFocusTrap>
+        <div>
+            <p-table 
+                [value]="estimateDetail.lineCategories" 
+                dataKey="id" 
+                (onEditComplete)="onEditComplete($event)"
+                styleClass="p-datatable-gridlines p-datatable-sm">
+                <ng-template pTemplate="header">
+                    <!-- customer information-->
+                    <th colspan="5" style="text-align: left;" class="surface-100">
+                        <tr>
+                            <td colspan="=3" class="customer-address pl-4 pb-4" *ngIf="selectedCustomer.id > 0">
+                                <span *ngIf="showDescription">
+                                    {{selectedCustomer.description}}<br/>
+                                </span>
+                                <span *ngIf="!showDescription">
+                                    {{selectedCustomer.displayName}}<br/>
+                                </span>
+                                {{selectedCustomer.address}}<br/>
+                                {{selectedCustomer.city}}, {{selectedCustomer.state}} {{selectedCustomer.zipCode}}
+                            </td>
+                        </tr>
+                    </th>
+                    <!--
+                    <th colspan="3" style="text-align: left;" class="surface-100">
+                        <tr>
+
+                            <td>
+                                <tr>
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <p-checkbox
+                                                    inputId="includeAdmin" 
+                                                    [binary]="true"
+                                                    (onChange)="addAdmin($event)"
+                                                    [(ngModel)]="estimate.includeAdmin">
+                                                </p-checkbox>
+                                            </td>
+                                            <td>
+                                                <label 
+                                                    class="ml-2 mb-2" 
+                                                    for="includeAdmin">Include Admin
+                                                </label>
+                                            </td>
+                                            
+                                            <td class="ml-25 mr-3 align-text-end"><label for="adminPercent">Admin %: </label>
+                                                <p-inputNumber
+                                                    id="adminPercent"
+                                                    pInput 
+                                                    [(ngModel)]="estimate.adminPercent"  
+                                                    inputId="percent" 
+                                                    prefix="%" 
+                                                    class="w-2rem m-2">
+                                                </p-inputNumber>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><label for="adminMessage">Admin Text: </label></td>
+                                            <td colspan="3">
+                                                <textarea [rows]="4" [cols]="60" pInputTextarea [(ngModel)]="estimate.adminMessage" ></textarea>
+                                            </td>
+                                        </tr>
+                                            </table>
+                                </tr>
+                                
+                            </td>
+
+                        </tr>
+                    </th>
+                -->
+                    <tr>
+                        <th colspan="2">
+                            <tr>
+                                <td class="pl-3">
+                                    Current Version: 
+                                    <p-checkbox 
+                                        class="pl-5"
+                                        [(ngModel)]="isCurrentVersion"
+                                        [binary]="true"
+                                        inputId="isCurrentVersion">
+                                    </p-checkbox>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="m-2">
+                                    <tr>
+                        
+                                        <!-- estimate name -->
+                                        <td>
+                                            <label for="name" class="text-lg m-3">Estimate Name: </label>
+                                        </td>
+                                        <td>
+                                            <input 
+                                                class="text-lg w-22rem m-2"
+                                                type="text" 
+                                                pInputText 
+                                                id="name" 
+                                                name="name" 
+                                                [(ngModel)]="estimate.estimateName"
+                                                required autofocus />
+                                            <small class="p-error block ml-2" *ngIf="submitted && !estimate.estimateName">Estimate Name is required</small>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <!-- description -->
+                                        <td>
+                                            <label for="name" class="text-lg m-3">Description:</label>
+                                        </td>
+                                        <td>
+                                            <input 
+                                                class="text-lg w-22rem m-2"
+                                                type="text" 
+                                                pInputText 
+                                                id="name" 
+                                                name="name" 
+                                                [(ngModel)]="estimateDetail.description"
+                                                required autofocus />
+                                            <small class="p-error block ml-2" *ngIf="submitted && !estimateDetail.description">Description is required</small>
+                                        </td>
+                                    </tr>
+                                </td>
+                            </tr>
+                        </th>
+
+                        <!-- Notes -->
+                        <th colspan="3">
+                            <tr>
+                                <td class="align-content-center">
+                                    Notes:<br/>
+                                    <textarea [rows]="8" [cols]="60" pInputTextarea [(ngModel)]="estimateDetail.notes"></textarea>
+                                </td>
+                            </tr>
+                        </th>
+                    </tr>
+                    <tr>
+                        <!-- Estimate Content -->
+                        <th style="width:10%">
+                            <button 
+                                pButton 
+                                pRipple 
+                                icon="pi pi-clone" 
+                                title="Assign a Category"
+                                class="p-button-rounded p-button-success mr-2" 
+                                (click)="addCategory()">
+                            </button>
+                            <button 
+                                pButton 
+                                pRipple 
+                                icon="pi pi-plus" 
+                                title="Create a New Category"
+                                class="p-button-rounded p-button-warning" 
+                                (click)="addNewCategory()">
+                            </button>
+                        </th>
+                        <th style="width:55%">Description</th>
+                        <th style="width:8%"style="text-align: center;">Qty</th>
+                        <th style="width:10%" style="text-align: center;">Rate</th>
+                        <th style="width:15%"style="text-align: center;">Total</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-lineCategory>
+                    <tr>
+                        <!-- buttons -->
+                        <td class="surface-100">
+                            <button 
+                                pButton 
+                                pRipple 
+                                icon="pi pi-clone" 
+                                title="Assign a Line Item"
+                                class="p-button-rounded p-button-success mr-2" 
+                                (click)="addLineItem(lineCategory.categoryId)">
+                            </button>
+                            <button 
+                                pButton 
+                                pRipple 
+                                icon="pi pi-plus" 
+                                title="Create a New Line Item"
+                                class="p-button-rounded p-button-warning" 
+                                (click)="addNewLineItem(lineCategory.categoryId)">
+                            </button>
+                        </td>
+                        <!-- Description -->
+                        <td pEditableColumn class="surface-100" colspan="3">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <input pInputText type="text" [(ngModel)]="lineCategory.description" class="text-lg w-30rem">
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    <b>{{lineCategory.description}}</b>
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                        <td style="text-align: right; padding-right: 2.5em;" class="surface-100 font-semibold">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <input pInputText type="text" class="text-lg" [(ngModel)]="lineCategory.total">
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{lineCategory.total | currency: 'USD'}}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                    </tr>
+                    <!-- lineCategory.lineItems -->
+                    <tr *ngFor="let lineItem of lineCategory.lineItems">
+                        <td></td>
+                        <td pEditableColumn>
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <input pInputText type="text" [(ngModel)]="lineItem.description" class="text-lg w-30rem">
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    - {{lineItem.description}} / {{lineItem.rateDesc}}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                        <td pEditableColumn 
+                            [pEditableColumn]="lineItem.quantity" 
+                            [pEditableColumnField]="lineItem.quantity" 
+                            [pEditableColumnRowIndex]="1"
+                            style="text-align: center;"
+                            class="text-lg w-6rem">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <input pInputText type="text" class="text-lg w-5rem" [(ngModel)]="lineItem.quantity">
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{lineItem.quantity}}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                        <td pEditableColumn style="text-align: right; padding-right: 2.5em;">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <input pInputText class="text-lg w-7rem" [(ngModel)]="lineItem.rate">
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{lineItem.rate | currency: 'USD'}}<!-- / {{lineItem.rateName}}-->
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                        <td style="text-align: right; padding-right: 2.5em;">
+                            <p-cellEditor>
+                                <ng-template pTemplate="input">
+                                    <input pInputText type="text" class="text-lg" [(ngModel)]="lineItem.total">
+                                </ng-template>
+                                <ng-template pTemplate="output">
+                                    {{lineItem.total | currency: 'USD'}}
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td class="surface-100 text-left ml-5" rowspan="3" colspan="3">
+                        </td>
+                        <td colspan="2" class="surface-100">
+                            <div class="totalsLabel">Subtotal</div>
+                            <div class="totalsAmt">{{estimateDetail.subtotalAmt | currency}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="surface-100">
+                            <div class="totalsLabel">Sales Tax ({{estimate.salesTax | percent:'2.2'}})</div>
+                            <div class="totalsAmt">{{estimateDetail.salesTaxAmt | currency}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="surface-100">
+                            <div class="totalsLabel">Total</div>
+                            <div class="totalsAmt">{{estimateDetail.totalAmt | currency}}</div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+<!-- add category dialog -->
+<p-dialog 
+    [(visible)]="addCategoryDialog" 
+    [style]="{width: '850px'}" 
+    header="Add or Remove Categories" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+
+    <ng-template pTemplate="content">
+        <div>
+            <p-table #dt 
+                [value]="categories" 
+                [globalFilterFields]="['name','description']"
+                [tableStyle]="{'min-width': '50rem'}"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+                [showCurrentPageReport]="true"
+                [rows]="10" 
+                [paginator]="true">
+
+                <ng-template pTemplate="caption">
+                    <div class="flex align-items-center justify-content-between">
+                        <div class="page-title">Available Categories</div>
+                            <div class="flex">
+                                <span class="p-input-icon-left ml-auto">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" (input)="applyFilterGlobal($event, 'contains')" placeholder="Filter" />
+                                </span>
+                            </div>
+                    </div>
+                </ng-template>
+            
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Select</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-category>
+                    <tr>
+                        <td><p-checkbox [binary]="true" [(ngModel)]="category.selected"></p-checkbox></td>
+                        <td>{{category.name}}</td>
+                        <td>{{category.description}}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideCategoryDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="validateCategoryForm()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog 
+    [(visible)]="addLineItemDialog" 
+    [style]="{width: '850px'}" 
+    header="Add or Remove Line Items" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+    <ng-template pTemplate="content">
+        <div>
+            <p-table #dt 
+                [value]="recordTypes" 
+                [globalFilterFields]="['name','description']"
+                [tableStyle]="{'min-width': '50rem'}"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+                [showCurrentPageReport]="true"
+                [rows]="10" 
+                [paginator]="true">
+
+                <ng-template pTemplate="caption">
+                    <div class="flex align-items-center justify-content-between">
+                        <div class="page-title">Available Line Items</div>
+                            <div class="flex">
+                                <span class="p-input-icon-left ml-auto">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text" (input)="applyFilterGlobal($event, 'contains')" placeholder="Filter" />
+                                </span>
+                            </div>
+                    </div>
+                </ng-template>
+            
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Select</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-recordType>
+                    <tr>
+                        <td><p-checkbox [binary]="true" [(ngModel)]="recordType.selected"></p-checkbox></td>
+                        <td>{{recordType.name}}</td>
+                        <td>{{recordType.description}}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideLineItemDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="validateLineItemForm()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog 
+    [(visible)]="addNewCategoryDialog" 
+    [style]="{width: '850px'}" 
+    header="Add New Category" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+    <ng-template pTemplate="content">
+        <div class="field">
+            <span>
+                <label for="name" class="text-primary text-lg">Name</label><br/>
+                <input 
+                    class="text-lg w-22rem mr-2"
+                    type="text" 
+                    pInputText 
+                    id="name" 
+                    name="name" 
+                    [(ngModel)]="newCategory.name"
+                    required autofocus />
+                <small class="p-error" *ngIf="submitted && !newCategory.name">Name is required.</small>
+            </span>
+        </div>
+        <div class="field">
+            <span>
+                <label for="description" class="text-primary text-lg">Description</label><br/>
+                <input  
+                    class="text-lg w-30rem mr-2"
+                    type="text" 
+                    id="description" 
+                    name="description" 
+                    pInputText
+                    [(ngModel)]="newCategory.description"
+                    required />
+                <small class="p-error" *ngIf="submitted && !newCategory.description">Description is required.</small>
+            </span>
+        </div>
+    </ng-template>
+
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideAddNewCategoryDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="validateNewCategoryForm()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog 
+    [(visible)]="addNewLineItemDialog" 
+    [style]="{width: '450px'}" 
+    header="Add New Line Item" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+    <ng-template pTemplate="content">
+        <div class="field">
+            <span>
+                <label for="type" class="text-primary text-lg">Name</label><br/>
+                <input 
+                    class="text-lg mr-2"
+                    type="text" 
+                    pInputText 
+                    id="name" 
+                    name="name" 
+                    [(ngModel)]="newRecordType.name"
+                    required autofocus />
+                <small class="p-error" *ngIf="submitted && !newRecordType.name">Name is required.</small>
+            </span>
+        </div>
+        <div class="field">
+            <span>
+                <label for="description" class="text-primary text-lg">Cost Type</label><br/>
+                <p-dropdown 
+                    [options]="costTypes" 
+                    optionLabel="name" 
+                    optionValue="id" 
+                    [(ngModel)]="newRecordType.costTypeId" 
+                    placeholder="Select a Cost Type">
+                </p-dropdown>
+                <small class="p-error" *ngIf="submitted && !newRecordType.cost">Cost Type is required.</small>
+            </span>
+        </div>
+        <div class="field">
+            <span>
+                <label for="name" class="text-primary text-lg">Description</label><br/>
+                <input  
+                    class="text-lg mr-2"
+                    type="text" 
+                    id="description" 
+                    name="description" 
+                    pInputText
+                    [(ngModel)]="newRecordType.description"
+                    required />
+                <small class="p-error" *ngIf="submitted && !newRecordType.description">Description is required.</small>
+            </span>
+        </div>
+        <div class="field">
+            <span>
+                <label for="description" class="text-primary text-lg">Cost</label><br/>
+                <input 
+                    class="text-lg mr-2"
+                    type="number" 
+                    id="cost" 
+                    name="cost" 
+                    pInputText
+                    [(ngModel)]="newRecordType.cost" 
+                    required />
+                <small class="p-error" *ngIf="submitted && !newRecordType.cost">Cost is required.</small>
+            </span>
+        </div>
+        <div class="h-5rem"></div>
+    </ng-template>
+
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideAddNewLineItemDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="validateNewLineItemForm()"></button>
+    </ng-template>
+</p-dialog>

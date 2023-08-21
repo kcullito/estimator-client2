@@ -1,0 +1,254 @@
+<p-toast></p-toast>
+<div class="card">
+    <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="Configure" icon="pi pi-cog" class="p-button-success mr-2" (click)="showConfigurationDialog()"></button>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <div>
+            </div>
+        </ng-template>
+    </p-toolbar>
+
+    <div class="formgrid grid">
+        <div class="field col-12 md:col-12 p-3">
+            <!-- estimates that need attention -->
+            <p-table #dt 
+                [value]="attentionEstimates" 
+                [rows]="10" 
+                [paginator]="true" 
+                [globalFilterFields]="['estimateName','customerName', 'statusName', 'estimator', 'phone1', 'email1']"
+                styleClass="p-datatable-sm"
+                [tableStyle]="{'width': '100%'}"
+                [rowHover]="true" 
+                dataKey="id"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+                [showCurrentPageReport]="true">
+                <!-- filter -->
+                <ng-template pTemplate="caption">
+                    <div class="flex align-items-center">
+                        <div class="page-title">Estimates That Need Attention</div>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width:15%" class="text-center">Estimate Name </th>
+                        <th style="width:20%" class="text-center">Customer </th>
+                        <th style="width:5%" class="text-center">Status </th>
+                        <th style="width:15%" class="text-center">Estimator </th>
+                        <th style="width:15%" class="text-center">Phone </th>
+                        <th style="width:15%" class="text-center">Email</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-estimate let-expanded="expanded">
+                    <tr>
+                        <td class="text-center">{{estimate.estimateName}}</td>
+                        <td class="text-center">{{estimate.customerName}} </td>
+                        <td class="text-center">{{estimate.statusName}}</td>
+                        <td class="text-center">{{estimate.estimator}}</td>
+                        <td class="text-center"><a 
+                            class="linkStyle" 
+                            href="tel:{{getCustomerPhone(estimate.customerId)}}">{{getCustomerPhone(estimate.customerId)}}</a>
+                        </td>
+                        <td class="text-center"><a 
+                            class="linkStyle" 
+                            href="mailto:{{getCustomerEmail(estimate.customerId)}}?subject=Estimate Status&body={{getMailMessage(estimate.customerId, estimate.id)}}"
+                            >{{getCustomerEmail(estimate.customerId)}}</a>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="6" class="text-red-300 text-center p-4">There are no estimates that need attention.</td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="summary">
+                    <div class="flex align-items-center justify-content-between" *ngIf="attentionEstimates.length === 1">
+                        In total there is {{attentionEstimates ? attentionEstimates.length : 0 }} estimate that needs attention
+                    </div>
+                    <div class="flex align-items-center justify-content-between" *ngIf="attentionEstimates.length === 0 || attentionEstimates.length > 1">
+                        In total there are {{attentionEstimates ? attentionEstimates.length : 0 }} estimates that need attention
+                    </div>
+                </ng-template>
+        
+            </p-table>
+
+        </div>
+        <div class="field col-12 md:col-12 p-3">
+            <p-table #dt 
+                [value]="feedbackEstimates" 
+                [rows]="10" 
+                [paginator]="true" 
+                [globalFilterFields]="['estimateName','customerName', 'statusName', 'estimator', 'phone1', 'email1']"
+                styleClass="p-datatable-sm"
+                [tableStyle]="{'width': '100%'}"
+                [rowHover]="true" 
+                dataKey="id"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+                [showCurrentPageReport]="true">
+                <!-- filter -->
+                <ng-template pTemplate="caption">
+                    <div class="flex align-items-center">
+                        <div class="page-title">Customer Feedback Calls</div>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width:15%" class="text-center">Project Name </th>
+                        <th style="width:20%" class="text-center">Customer </th>
+                        <th style="width:15%" class="text-center">Completed </th>
+                        <th style="width:15%" class="text-center">Status </th>
+                        <th style="width:20%" class="text-center">Scheduled </th>
+                        <th style="width:10%" class="text-center"> </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-estimate let-expanded="expanded">
+                    <tr>
+                        <td class="text-center">{{estimate.estimateName}}</td>
+                        <td class="text-center">{{estimate.customerName}}</td>
+                        <td class="text-center">6/30/2023</td>
+                        <td class="text-center">{{estimate.statusName}}</td>
+                        <td class="text-center"></td>
+                        <td class="text-center">
+                            <button 
+                                pButton 
+                                pRipple 
+                                title="View Customer"
+                                icon="pi pi-eye" 
+                                class="p-button-rounded p-button-warning mr-2" 
+                                (click)="viewCustomer(estimate.customerId)">
+                            </button>
+                            <button 
+                                pButton 
+                                pRipple 
+                                title="Survey"
+                                icon="pi pi-file-edit" 
+                                class="p-button-rounded p-button-success mr-2" 
+                                (click)="viewSurvey(estimate.customerId)">
+                            </button>
+                        </td>
+
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="6" class="text-red-300 text-center p-4">There are no customer feedback calls.</td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="summary">
+                    <div class="flex align-items-center justify-content-between" *ngIf="feedbackEstimates.length === 1">
+                        In total there is {{feedbackEstimates ? feedbackEstimates.length : 0 }} customer feedback call
+                    </div>
+                    <div class="flex align-items-center justify-content-between" *ngIf="feedbackEstimates.length === 0 || feedbackEstimates.length > 1">
+                        In total there are {{feedbackEstimates ? feedbackEstimates.length : 0 }} customer feedback calls
+                    </div>
+                </ng-template>
+        
+            </p-table>
+        </div>
+    </div>
+    <div class="flex align-items-center">
+        <div class="page-title pl-5">Analytics</div>
+    </div>
+
+    <div class="formgrid grid p-2">
+        <div class="field col-12 md:col-6">
+            <p-chart type="bar" [data]="basicData" [options]="basicOptions"></p-chart>
+        </div>
+        <div class="field col-12 md:col-3 align-center">
+            <span>How they found us</span>
+            <div style="width: 400px;">
+                <p-chart type="pie" [data]="sourceData" [options]="sourceOptions"></p-chart>
+            </div>
+        </div>
+        <div class="field col-12 md:col-3 align-center">
+            <span>Satisfaction</span>
+            <div style="width: 400px;">
+                <p-chart type="pie" [data]="scoreData" [options]="scoreOptions"></p-chart>
+            </div>
+        </div>
+    </div>
+    <div class="formgrid grid">
+        <div class="field col-12 md:col-12">
+            <p-chart type="bar" [data]="barData" [options]="barOptions"></p-chart>
+        </div>
+    </div>
+    
+
+
+<p-dialog 
+    [(visible)]="showConfigDialog" 
+    [style]="{width: '600px'}" 
+    header="Dashborad Configuration" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+    <ng-template pTemplate="content">
+        <div class="card">
+            <div class="formgrid grid">
+                <div class="field col-12 md:col-12">
+                    <label>Estimate Attention Box</label>
+                    <div class="field col-12 md:col-12">(coming soon)</div>
+                </div>
+                <div class="field col-12 md:col-12">
+                    <label>Customer Feedback Calls</label>
+                    <div class="field col-12 md:col-12">(coming soon)</div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Close" icon="pi pi-times" class="p-button-text" (click)="hideConfigDialog()"></button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog 
+    [(visible)]="showCustomerDialog" 
+    [style]="{width: '600px'}" 
+    header="Customer Details" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+    <ng-template pTemplate="content">
+        <div class="card">
+            <div class="formgrid grid">
+                <div class="field col-12 md:col-12">
+                    <label>Customer Name</label>
+                    <div class="field col-12 md:col-12">name</div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Close" icon="pi pi-times" class="p-button-text" (click)="hideCustomerDialog()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog 
+    [(visible)]="showSurveyDialog" 
+    [style]="{width: '600px'}" 
+    header="Customer Details" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+    <ng-template pTemplate="content">
+        <div class="card">
+            <div class="formgrid grid">
+                <div class="field col-12 md:col-12">
+                    <label>Customer Survey</label>
+                    <div class="field col-12 md:col-12">survey appears here.</div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Close" icon="pi pi-times" class="p-button-text" (click)="hideSurveyDialog()"></button>
+    </ng-template>
+</p-dialog>
+

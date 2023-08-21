@@ -1,0 +1,122 @@
+<div class="card">
+
+    <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNewSource()"></button>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <div class="flex">
+            </div>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt 
+        [value]="sources" 
+        [rows]="10" 
+        [paginator]="true" 
+        [globalFilterFields]="['name','description']"
+        styleClass="p-datatable-sm"
+        [rowHover]="true" 
+        dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+        [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+                <div class="page-title">Manage Surveys</div>
+                <span class="p-input-icon-left ml-auto">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="applyFilterGlobal($event, 'contains')" placeholder="Filter" />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th></th>
+                <th pSortableColumn="name">Survey Name<p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-survey let-expanded="expanded">
+            <tr>
+                <td>
+                </td>
+                <td>{{survey.name}}</td>
+                <td>{{survey.description}}</td>
+                <td>
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="Edit Survey"
+                        icon="pi pi-pencil" 
+                        class="p-button-rounded p-button-success mr-2" 
+                        (click)="editSource(survey)">
+                    </button>
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="Delete Survey"
+                        icon="pi pi-trash" 
+                        class="p-button-rounded p-button-danger" 
+                        (click)="deleteSource(survey)">
+                    </button>
+                </td>
+            </tr>
+        </ng-template>
+    
+        <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between" *ngIf="sources.length === 1">
+                In total there is {{sources ? sources.length : 0 }} source
+            </div>
+            <div class="flex align-items-center justify-content-between" *ngIf="sources.length === 0 || sources.length > 1">
+                In total there are {{sources ? sources.length : 0 }} sources
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- Survey Dialog -->
+
+<p-dialog 
+[(visible)]="sourceDialog" 
+[style]="{width: '600px'}" 
+header="Source Details" 
+[modal]="true"
+styleClass="p-fluid formgrid">
+
+<ng-template pTemplate="content">
+<div class="card">
+    <div class="formgrid grid">
+        <div class="field col-12 md:col-12">
+            <label>Source Name</label>
+            <input 
+                class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                type="text" 
+                id="displayName" 
+                name="displayName" 
+                pInputText
+                [(ngModel)]="source.name" 
+                required />
+        </div>
+        <div class="field col-12 md:col-12">
+            <label>Source Description</label>
+            <input 
+                class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                type="text" 
+                id="displayName" 
+                name="displayName" 
+                pInputText
+                [(ngModel)]="source.description" 
+                required />
+        </div>
+
+    </div>
+</div>
+</ng-template>
+
+<ng-template pTemplate="footer">
+<button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideSourceDialog()"></button>
+<button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="validateSourceForm()"></button>
+</ng-template>
+</p-dialog>
+

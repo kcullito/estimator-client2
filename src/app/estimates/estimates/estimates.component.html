@@ -1,0 +1,182 @@
+<p-toast></p-toast>
+<div class="card">
+<p-toolbar styleClass="mb-4 gap-2">
+    <ng-template pTemplate="left">
+        <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+    </ng-template>
+
+    <ng-template pTemplate="right">
+        <!--
+        <div>
+            <button pButton pRipple label="Delete Detail" (click)="deletedDetail()"></button>
+        </div>-->
+    </ng-template>
+</p-toolbar>
+
+<p-table #dt 
+    [value]="selectedEstimates" 
+    [rows]="10" 
+    [paginator]="true" 
+    [globalFilterFields]="['version','estimateName','customerName', 'updated', 'estimateTypeString', 'statusName', 'totalAmt', 'estimator']"
+    [tableStyle]="{'width': '100%'}"
+    [(selection)]="selectedEstimates" 
+    [rowHover]="true" 
+    dataKey="id"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+    [showCurrentPageReport]="true">
+
+    <!-- filter -->
+    <ng-template pTemplate="caption">
+        <div class="flex align-items-center justify-content-between">
+            <div class="page-title">Manage Estimates</div>
+            <span class="p-input-icon-left">
+                <div class="flex">
+                    <span class="p-input-icon-left ml-auto">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="applyFilterGlobal($event, 'contains')" placeholder="Filter" />
+                    </span>
+                </div>
+            </span>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+        <tr>
+            <th></th>
+            <th pSortableColumn="id">Version<p-sortIcon field="currentVersion" class="text-center"></p-sortIcon></th>
+            <th pSortableColumn="estimateName">Estimate Name <p-sortIcon field="estimateName" class="text-center"></p-sortIcon></th>
+            <th pSortableColumn="customerName">Customer <p-sortIcon field="customerName"></p-sortIcon></th>
+            <th pSortableColumn="estimateTypeString">Type <p-sortIcon field="estimateTypeString"></p-sortIcon></th>
+            <th pSortableColumn="statusName">Status<p-sortIcon field="statusName" class="text-center"></p-sortIcon></th>
+            <th pSortableColumn="totalAmt">Total Amt <p-sortIcon field="totalAmt"></p-sortIcon></th>
+            <th pSortableColumn="updated">Updated <p-sortIcon field="updated"></p-sortIcon></th>
+            <th pSortableColumn="estimator">Estimator <p-sortIcon field="estimator"></p-sortIcon></th>
+            <th></th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-estimate let-expanded="expanded">
+        <tr>
+            <td>
+                <button *ngIf="estimate.estimateDetails.length > 1" type="button" pButton pRipple [pRowToggler]="estimate" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+            </td>
+            <td class="text-center">{{estimate.currentVersion}}</td>
+            <td>{{estimate.estimateName}}</td>
+            <td>{{estimate.customerName}} </td>
+<!--            <td>{{getCustomerName(estimate.customerId)}} </td>-->
+            <td>{{estimate.estimateTypeString}}</td>
+            <td class="text-center">{{estimate.statusName}}</td>
+            <td class="text-right">{{estimate.totalAmt | currency: 'USD'}}</td>
+            <td class="text-center">{{estimate.updated | date: 'shortDate'}} </td>
+            <td class="text-center">{{estimate.estimator}}</td>
+            <!-- buttons -->
+            <td>
+                <button pButton pRipple 
+                    icon="pi pi-pencil" 
+                    title="Edit Estimate" 
+                    class="p-button-rounded p-button-success mr-2" 
+                    (click)="editEstimate(estimate)">
+                </button>
+                <button pButton pRipple 
+                    label=""
+                    title="Show Notes" 
+                    icon="pi pi-file-edit"
+                    class="p-button-rounded p-button-success mr-2" 
+                    (click)="showNotes(estimate)">
+                </button>
+                <button pButton pRipple 
+                    icon="pi pi-file" 
+                    title="Create Estimate" 
+                    class="p-button-rounded p-button-warning mr-2" 
+                    (click)="createEstimate(estimate, estimate.currentVersion)">
+                </button>
+                <button pButton pRipple 
+                    icon="pi pi-trash" 
+                    title="Delete Estimate" 
+                    class="p-button-rounded p-button-danger" 
+                    (click)="deleteEstimate(estimate)">
+                </button>
+            </td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="rowexpansion" let-estimate>
+        <tr class="bg-primary-reverse w-full" *ngIf="estimate.estimateDetails.length > 1">
+            <td colspan="10">Estimate versions for {{estimate.customerName}}
+                <div class="p-3">
+                    <p-table [value]="estimate.estimateDetails">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="version">Version<p-sortIcon field="version"></p-sortIcon></th>
+                                <th pSortableColumn="updated">Updated <p-sortIcon field="updated"></p-sortIcon></th>
+                                <th pSortableColumn="estimateType.name">Status <p-sortIcon field="estimateType"></p-sortIcon></th>
+                                <th pSortableColumn="status">Subtotal<p-sortIcon field="subtotalAmt"></p-sortIcon></th>
+                                <th pSortableColumn="totalAmt">Total <p-sortIcon field="totalAmt"></p-sortIcon></th>
+                                <th></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-estimateDetail>
+                            <tr *ngIf="estimateDetail.version != estimate.currentVersion">
+                                <td class="text-center">{{estimateDetail.version}}</td>
+                                <td>{{estimateDetail.updated | date: 'shortDate'}} </td>
+                                <td>{{getEstimateStatusName(estimateDetail.statusId)}} </td>
+                                <td>{{estimateDetail.subtotalAmt | currency: 'USD'}} </td>
+                                <td>{{estimateDetail.totalAmt | currency: 'USD'}} </td>
+                                <!-- buttons -->
+                                <td class="text-center">
+                                    <button pButton pRipple 
+                                        label=""
+                                        title="Show Notes" 
+                                        icon="pi pi-file-edit"
+                                        class="p-button-rounded p-button-success mr-2" 
+                                        (click)="showDetailNotes(estimateDetail)">
+                                    </button>
+                                    <button pButton pRipple 
+                                        icon="pi pi-trash" 
+                                        title="Delete Estimate" 
+                                        class="p-button-rounded p-button-danger" 
+                                        (click)="deleteEstimateDetail(estimate, estimateDetail)">
+                                    </button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="7">Other versions will appear here.</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+        <div 
+            class="flex align-items-center justify-content-between" 
+            *ngIf="selectedEstimates.length > 1 || selectedEstimates.length === 0">
+                In total there are {{selectedEstimates ? selectedEstimates.length : 0 }} estimates.
+        </div>
+        <div 
+            class="flex align-items-center justify-content-between" 
+            *ngIf="selectedEstimates.length === 1">
+                In total there is {{selectedEstimates ? selectedEstimates.length : 0 }} estimate.
+        </div>
+    </ng-template>
+    </p-table>
+</div>
+<!--
+    </ng-container>
+</ng-container>
+-->
+
+<p-dialog 
+    [(visible)]="shownotesDialog" 
+    [style]="{width: '500px'}" 
+    header="Notes for version {{notesVersion}}" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+    <ng-template pTemplate="content">
+        <div>
+            <textarea [rows]="8" [cols]="80" pInputTextarea>{{notesText}}</textarea>
+        </div>
+    </ng-template>
+</p-dialog>

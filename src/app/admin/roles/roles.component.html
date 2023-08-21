@@ -1,0 +1,100 @@
+<p-toast></p-toast>
+<div class="card">
+    <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt 
+        [value]="roles" 
+        [rows]="10" 
+        [paginator]="true" 
+        [globalFilterFields]="['authority']"
+        [tableStyle]="{'width': '100%'}"
+        [(selection)]="selectedRoles" 
+        [rowHover]="true" 
+        dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+        [showCurrentPageReport]="true">
+
+        <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+                <div class="page-title">Manage Roles</div>
+                <span class="p-input-icon-left">
+                </span>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 4rem">
+                </th>
+                <th pSortableColumn="firstName" style="min-width:15rem">Role Name<p-sortIcon field="firstName"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-role>
+            <tr>
+                <td>
+                </td>
+                <td>{{role.authority}}</td>
+                <td>
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="Edit User"
+                        icon="pi pi-pencil" 
+                        class="p-button-rounded p-button-success mr-2" 
+                        (click)="editRole(role)">
+                    </button>
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="Delete User"
+                        icon="pi pi-trash" 
+                        class="p-button-rounded p-button-warning" 
+                        (click)="deleteRole(role)">
+                    </button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between">
+                In total there are {{roles ? roles.length : 0 }} users.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog 
+    [(visible)]="roleDialog" 
+    [style]="{width: '450px'}" 
+    header="{{dialogTitle}}" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+    <ng-template pTemplate="content">
+        <div class="field">
+            <span>
+            <label for="authority" class="text-primary text-lg">Role Name</label><br/>
+            <input 
+                    class="text-lg mr-2"
+                    type="text" 
+                    pInputText 
+                    id="authority" 
+                    name="authority" 
+                    [(ngModel)]="role.authority"
+                    required autofocus />
+                <small class="p-error" *ngIf="submitted && !role.authority">Role Name is required.</small>
+            </span>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="validateForm()"></button>
+    </ng-template>
+
+</p-dialog>

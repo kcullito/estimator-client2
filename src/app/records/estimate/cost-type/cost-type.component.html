@@ -1,0 +1,123 @@
+<p-toast></p-toast>
+<div class="card">
+    <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+            <button pButton pRipple label="" icon="pi pi-trash" class="p-button-danger" (click)="deleteSelectedCostTypes()" 
+                [disabled]="!selectedCostTypes || !selectedCostTypes.length"></button>
+        </ng-template>
+        <ng-template pTemplate="right">
+
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt 
+        [value]="costTypes" 
+        dataKey="id"
+        [(selection)]="selectedCostTypes" 
+        [tableStyle]="{'width': '100%'}"
+        [rowHover]="true" 
+        [paginator]="true" 
+        [rows]="10" 
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+        [showCurrentPageReport]="true"
+        [globalFilterFields]="['type','name','description']">
+
+        <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+                <div class="page-title">Manage Cost Types</div>
+                <span class="p-input-icon-left ml-auto">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="applyFilterGlobal($event, 'contains')" placeholder="Filter" />
+                </span>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 4rem">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                </th>
+                <th pSortableColumn="type" style="min-width:15rem">Type <p-sortIcon field="type"></p-sortIcon></th>
+                <th pSortableColumn="name" style="min-width:15rem">Name <p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="description" style="min-width:10rem">Description<p-sortIcon field="description"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-costType>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="costType"></p-tableCheckbox>
+                </td>
+                <td>{{costType.type}}</td>
+                <td>{{costType.name}}</td>
+                <td>{{costType.description}}</td>
+                <td>
+                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editCostType(costType)"></button>
+                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" (click)="deleteCostType(costType)"></button>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between">
+                In total there are {{costTypes ? costTypes.length : 0 }} cost types.
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+    
+<p-dialog 
+    [(visible)]="costTypeDialog" 
+    [style]="{width: '450px'}" 
+    header="Cost Type Details" 
+    [modal]="true"
+    styleClass="p-fluid">
+
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label for="type" class="text-primary text-lg block">Type</label>
+            <input 
+                class="text-lg mr-2"
+                type="text" 
+                pInputText 
+                id="type" 
+                name="type" 
+                [(ngModel)]="costType.type"
+                required autofocus />
+            <small class="p-error block" *ngIf="submitted && !costType.type">Type is required.</small>
+        </div>
+        <div class="field">
+            <label for="name" class="text-primary text-lg block">Name</label>
+            <input  
+                class="text-lg mr-2"
+                type="text" 
+                id="name" 
+                name="name" 
+                pInputText
+                [(ngModel)]="costType.name"
+                required />
+            <small class="p-error block" *ngIf="submitted && !costType.name">Name is required.</small>
+        </div>
+        <div class="field">
+            <label for="description" class="text-primary text-lg block">Description</label>
+            <input 
+                class="text-lg"
+                type="text" 
+                id="description" 
+                name="description" 
+                pInputText
+                [(ngModel)]="costType.description" 
+                required />
+            <small class="p-error block" *ngIf="submitted && !costType.description">Description is required.</small>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="validateForm()"></button>
+    </ng-template>
+</p-dialog>
+
+

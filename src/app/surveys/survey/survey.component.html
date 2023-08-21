@@ -1,0 +1,136 @@
+<div class="card">
+
+    <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNewSurvey()"></button>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <div class="flex">
+            </div>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt 
+        [value]="surveys" 
+        [rows]="10" 
+        [paginator]="true" 
+        [globalFilterFields]="['name','description']"
+        styleClass="p-datatable-sm"
+        [rowHover]="true" 
+        dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+        [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+                <div class="page-title">Manage Surveys</div>
+                <span class="p-input-icon-left ml-auto">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="applyFilterGlobal($event, 'contains')" placeholder="Filter" />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th></th>
+                <th pSortableColumn="name">Survey Name<p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
+                <th pSortableColumn="source">Source <p-sortIcon field="source"></p-sortIcon></th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-survey let-expanded="expanded">
+            <tr>
+                <td>
+                    <button *ngIf="survey.questions.length > 0" type="button" pButton pRipple [pRowToggler]="survey" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                </td>
+                <td>{{survey.name}}</td>
+                <td>{{survey.description}}</td>
+                <td>{{survey.sourceName}}</td>
+                <td>
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="Edit Survey"
+                        icon="pi pi-pencil" 
+                        class="p-button-rounded p-button-success mr-2" 
+                        (click)="editSurvey(survey)">
+                    </button>
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="View Survey"
+                        icon="pi pi-eye" 
+                        class="p-button-rounded p-button-warning mr-2" 
+                        (click)="viewSurvey(survey)">
+                    </button>
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="Delete Survey"
+                        icon="pi pi-trash" 
+                        class="p-button-rounded p-button-danger" 
+                        (click)="deleteSurvey(survey)">
+                    </button>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between" *ngIf="surveys.length === 1">
+                In total there is {{surveys ? surveys.length : 0 }} survey
+            </div>
+            <div class="flex align-items-center justify-content-between" *ngIf="surveys.length === 0 || surveys.length > 1">
+                In total there are {{surveys ? surveys.length : 0 }} surveys
+            </div>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- Survey Dialog -->
+
+<p-dialog 
+[(visible)]="surveyDialog" 
+[style]="{width: '400px'}" 
+header="Survey Details" 
+[modal]="true"
+styleClass="p-fluid formgrid">
+
+<ng-template pTemplate="content">
+<div class="card">
+    <div class="formgrid grid">
+        <div class="field col-12 md:col-6">
+            <label>Survey Name</label>
+            <input 
+                class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                type="text" 
+                id="displayName" 
+                name="displayName" 
+                pInputText
+                [(ngModel)]="survey.name" 
+                required />
+        </div>
+        <div class="field col-12 md:col-6">
+            <label>Survey Source</label>
+            <p-dropdown [options]="sources" placeholder="Select a Source" [(ngModel)]="selectedSource" optionLabel="name"></p-dropdown>
+        </div>
+        <div class="field col-12 md:col-12">
+            <label>Survey Description</label>
+            <input 
+                class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                type="text" 
+                id="displayName" 
+                name="displayName" 
+                pInputText
+                [(ngModel)]="survey.description" 
+                required />
+        </div>
+    </div>
+</div>
+</ng-template>
+
+<ng-template pTemplate="footer">
+<button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideSurveyDialog()"></button>
+<button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="validateSurveyForm()"></button>
+</ng-template>
+</p-dialog>
+

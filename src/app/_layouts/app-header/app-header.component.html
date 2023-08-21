@@ -1,0 +1,125 @@
+<p-toast></p-toast>
+<p-menubar [model]="menuItems" class="z-2">
+    <ng-template pTemplate="start" class="z-2">
+        <img src="../../../assets/images/RNJRedBGClear.png" height="45" class="hoverChanger">
+    </ng-template>
+    <ng-template pTemplate="end">
+        <button 
+            pButton 
+            pRipple 
+            label="Logout" 
+            icon="pi pi-sign-out" 
+            class="" 
+            (click)="logout()">
+        </button>
+        <span *ngIf="user.initials.length < 1">
+            <p-avatar 
+                icon="pi pi-user" 
+                styleClass="ml-4" 
+                size="large" 
+                shape="circle" 
+                title="{{user.firstname}} {{user.lastname}}"
+                (click)="showUserProfile()">
+            </p-avatar>
+        </span>
+        <span *ngIf="user.initials.length > 0">
+            <p-avatar 
+                class="user-avatar"
+                styleClass="ml-4" 
+                size="large" 
+                shape="circle" 
+                label={{user.initials}}
+                title="{{user.firstname}} {{user.lastname}}"
+                (click)="showUserProfile()">
+            </p-avatar>
+        </span>
+        <p-confirmDialog></p-confirmDialog>
+        <!--<button  (click)="changeStyleMenu()"></button>-->
+        </ng-template>
+</p-menubar>
+
+<p-dialog 
+    [(visible)]="showProfileDialog" 
+    [style]="{width: '500px'}" 
+    header="Profile for {{user.firstname}} {{user.lastname}}" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+    <ng-template pTemplate="content">
+        
+        <div class="card">
+            <div class="formgrid grid">
+                <label class="field col-12 md:col-12 text-center surface-ground p-2 font-semibold text-lg text-primary">Change Profile</label>
+                <div class="field col-12 md:col-6">
+                    <label for="firstName">First Name</label>
+                    <input 
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        type="text" 
+                        pInputText 
+                        id="firstName" 
+                        name="firstName" 
+                        [(ngModel)]="user.firstname"
+                        required />
+                </div>
+                <div class="field col-12 md:col-6">
+                    <label for="lastName">Last Name</label>
+                    <input  
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        type="text" 
+                        id="lastName" 
+                        name="lastName" 
+                        pInputText
+                        [(ngModel)]="user.lastname"
+                        required />
+                </div>
+                <div class="field field col-12 md:col-12">
+                    <label for="email1">Email</label>
+                    <input 
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        type="text" 
+                        id="email" 
+                        name="email" 
+                        pInputText
+                        [(ngModel)]="user.email" />
+                </div>
+                <small class="p-error block" *ngIf="submitted && !validEmail">Please enter a valid email address!</small>
+
+                <label class="field col-12 md:col-12 text-center surface-ground p-2 font-semibold text-lg text-primary">Change Password</label>
+                <div class="field field col-12 md:col-12">
+                    <label for="password1">New Password</label>
+                    <p-password 
+                        id="password1" 
+                        [(ngModel)]="password1" 
+                        [toggleMask]="true">
+                    </p-password>
+                    
+                </div>
+                <div class="field field col-12 md:col-12">
+                    <label for="password2">Repeat New Password</label>
+                    <p-password 
+                        id="password2" 
+                        [(ngModel)]="password2" 
+                        [feedback]="false" 
+                        [toggleMask]="true">
+                    </p-password>
+                </div>
+            </div>
+            <small class="p-error block" *ngIf="submitted && !passwordsMatch">Passwords must match!</small>
+        </div>
+        <div class="formgrid grid">
+                <label class="field col-12 md:col-12 text-center surface-ground p-2 font-semibold text-lg text-primary">Change Theme</label>
+                <div style="height: 80px; width: 100px; position: relative;" class="p-speeddial-themes">
+                    <p-speedDial
+                        [model]="speedDialItems"
+                        direction="up"
+                        type="semi-circle">
+                    </p-speedDial>
+                </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="validateForm()"></button>
+    </ng-template>
+</p-dialog>

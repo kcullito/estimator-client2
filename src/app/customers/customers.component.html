@@ -1,0 +1,388 @@
+<p-toast></p-toast>
+<div class="card">
+    <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+        </ng-template>
+        <ng-template pTemplate="right">
+            <div class="flex">
+            </div>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt 
+        [value]="customers" 
+        [rows]="10" 
+        [paginator]="true" 
+        [globalFilterFields]="['firstName','lastName','description','address','city','state','zipCode','phone1','email1']"
+        styleClass="p-datatable-sm"
+        [(selection)]="selectedCustomers" 
+        [rowHover]="true" 
+        dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+        [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+                <div class="page-title">Manage Customers</div>
+                <span class="p-input-icon-left ml-auto">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="applyFilterGlobal($event, 'contains')" placeholder="Filter" />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 2%"></th>
+                <!--
+                <th pSortableColumn="firstName" style="width:8%">First Name <p-sortIcon field="firstName"></p-sortIcon></th>
+                <th pSortableColumn="lastName" style="width:10%">Last Name <p-sortIcon field="lastName"></p-sortIcon></th>
+                -->
+                <th pSortableColumn="displayName" style="width:12%">Display Name<p-sortIcon field="description"></p-sortIcon></th>
+                <th pSortableColumn="address" style="width:15%">Address <p-sortIcon field="address"></p-sortIcon></th>
+                <th pSortableColumn="city" style="width:10%">City <p-sortIcon field="city"></p-sortIcon></th>
+                <th pSortableColumn="state" style="width:6%">State <p-sortIcon field="state"></p-sortIcon></th>
+                <th pSortableColumn="zipCode" style="width:7%">Zip <p-sortIcon field="zipCode"></p-sortIcon></th>
+                <th pSortableColumn="phone1" style="width:10%">Primary Phone <p-sortIcon field="phone1"></p-sortIcon></th>
+                <th pSortableColumn="email1" style="width:13%">Primary Email <p-sortIcon field="email1"></p-sortIcon></th>
+                <th style="min-width:7%"></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-customer let-expanded="expanded">
+            <tr>
+                <td>
+                    <button *ngIf="customer.fileDetails.length > 0" type="button" pButton pRipple [pRowToggler]="customer" class="p-button-text p-button-rounded p-button-plain" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                </td>
+                <!--
+                <td>{{customer.firstName}}</td>
+                <td>{{customer.lastName}}</td>
+                -->
+                <td>{{customer.displayName}}</td>
+                <td>{{customer.address}}</td>
+                <td>{{customer.city}}</td>
+                <td>{{customer.state}}</td>
+                <td>{{customer.zipCode}}</td>
+                <td>{{customer.phone1}}</td>
+                <td><a class="text-800" href="mailto:{{customer.email1}}">{{customer.email1}}</a></td>
+                <td>
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="Edit Customer"
+                        icon="pi pi-pencil" 
+                        class="p-button-rounded p-button-success mr-2" 
+                        (click)="editCustomer(customer)">
+                    </button>
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="View Customer Record"
+                        icon="pi pi-eye" 
+                        class="p-button-rounded p-button-warning mr-2" 
+                        (click)="viewCustomer(customer)">
+                    </button>
+                    <button 
+                        pButton 
+                        pRipple 
+                        title="Delete Customer"
+                        icon="pi pi-trash" 
+                        class="p-button-rounded p-button-danger" 
+                        (click)="deleteCustomer(customer)">
+                    </button>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="rowexpansion" let-customer>
+            <tr class="bg-primary-reverse w-full" *ngIf="customer.fileDetails.length > 0">
+                <td colspan="11">
+                    Estimates for {{customer.displayName}}
+                    <div class="p-3">
+                        <p-table [value]="customer.fileDetails">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th pSortableColumn="fileName">File Name <p-sortIcon field="fileName"></p-sortIcon></th>
+                                    <th pSortableColumn="version">Version<p-sortIcon field="version"></p-sortIcon></th>
+                                    <th pSortableColumn="lastModified">Last Modified <p-sortIcon field="updated"></p-sortIcon></th>
+                                    <th pSortableColumn="fileSize">File Size <p-sortIcon field="estimateType"></p-sortIcon></th>
+                                    <th pSortableColumn="createdAt">Created At <p-sortIcon field="statusId"></p-sortIcon></th>
+                                    <th pSortableColumn="lastAccessed">Last Accessed<p-sortIcon field="subtotalAmt"></p-sortIcon></th>
+                                    <th></th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-fileDetail>
+                                <tr>
+                                    <td>{{fileDetail.fileName}}</td>
+                                    <td>{{fileDetail.version}} </td>
+                                    <td>{{fileDetail.lastModified | date: 'shortDate'}} </td>
+                                    <td>{{fileDetail.fileSize | number}} </td>
+                                    <td>{{fileDetail.createdAt | date: 'shortDate'}} </td>
+                                    <td>{{fileDetail.lastAccessed | date: 'shortDate'}} </td>
+                                    <td>
+                                        <button 
+                                            pButton 
+                                            pRipple 
+                                            title="View in Browser"
+                                            icon="pi pi-book" 
+                                            class="p-button-rounded p-button-success mr-2" 
+                                            (click)="downloadPdf(customer, fileDetail.fileName, false)">
+                                        </button>
+                                        <button 
+                                            pButton 
+                                            pRipple 
+                                            title="Download Document"
+                                            icon="pi pi-download" 
+                                            class="p-button-rounded p-button-success mr-2" 
+                                            (click)="downloadPdf(customer, fileDetail.fileName, true)">
+                                        </button>
+                                        <button 
+                                            pButton 
+                                            pRipple 
+                                            title="Delete Document"
+                                            icon="pi pi-trash" 
+                                            class="p-button-rounded p-button-danger mr-2" 
+                                            (click)="deletePdf(customer, fileDetail.fileName)">
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td colspan="11">No estimates found for this customer.</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between" *ngIf="customers.length === 1">
+                In total there is {{customers ? customers.length : 0 }} customer
+            </div>
+            <div class="flex align-items-center justify-content-between" *ngIf="customers.length === 0 || customers.length > 1">
+                In total there are {{customers ? customers.length : 0 }} customers
+            </div>
+        </ng-template>
+
+    </p-table>
+</div>
+
+<p-dialog 
+    [(visible)]="customerDialog" 
+    [style]="{width: '600px'}" 
+    header="Customer Details" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+    <ng-template pTemplate="content">
+        <div class="card">
+            <div class="formgrid grid">
+                <div class="field col-12 md:col-12">
+                    <label class="field col-12 md:col-12 text-center surface-ground p-2 font-semibold text-lg text-primary">Display Name</label>
+                    <input 
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        type="text" 
+                        id="displayName" 
+                        name="displayName" 
+                        pInputText
+                        [(ngModel)]="customer.displayName" 
+                        required />
+                </div>
+                <div class="field col-12 md:col-12 text-center surface-ground p-2 font-semibold text-lg text-primary">Primary Contact</div>
+                <div class="field col-12 md:col-6">
+                    <label for="firstName">First Name</label>
+                    <input 
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        (change)="updateDisplayName($event)"
+                        type="text" 
+                        pInputText 
+                        id="firstName" 
+                        name="firstName" 
+                        [(ngModel)]="customer.firstName"
+                        required autofocus />
+                    <small class="p-error block" *ngIf="submitted && !customer.firstName">First Name is required.</small>
+                </div>
+                <div class="field col-12 md:col-6">
+                    <label for="lastName">Last Name</label>
+                    <input  
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        (change)="updateDisplayName($event)"
+                        type="text" 
+                        id="lastName" 
+                        name="lastName" 
+                        pInputText
+                        [(ngModel)]="customer.lastName"
+                        required />
+                    <small class="p-error block" *ngIf="submitted && !customer.lastName">Last Name is required.</small>
+                </div>
+                <div class="field col-12 md:col-6">
+                    <label for="phone1">Phone</label>
+                    <p-inputMask 
+                        mask="(999) 999-9999" 
+                        id="phone1" 
+                        [(ngModel)]="customer.phone1">
+                    </p-inputMask>
+                </div>
+                <div class="field field col-12 md:col-6">
+                    <label for="email1">Email</label>
+                    <input 
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        type="text" 
+                        id="email1" 
+                        name="email1" 
+                        pInputText
+                        [(ngModel)]="customer.email1" />
+                    <small class="p-error block" *ngIf="submitted && invalidEmail1">Invalid email address.</small>
+                </div>
+                <div class="field col-12 md:col-12 text-center surface-ground p-2 font-semibold text-lg text-primary">Secondary Contact</div>
+                <div class="field col-12 md:col-6">
+                    <label for="firstName2">First Name</label>
+                    <input 
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        type="text" 
+                        pInputText 
+                        (change)="updateDisplayName($event)"
+                        id="firstName2" 
+                        name="firstName2" 
+                        [(ngModel)]="customer.firstName2"
+                        required autofocus />
+                    <small class="p-error block" *ngIf="submitted && !customer.firstName2">First Name is required.</small>
+                </div>
+                <div class="field col-12 md:col-6">
+                    <label for="lastName2">Last Name</label>
+                    <input  
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        type="text" 
+                        (change)="updateDisplayName($event)"
+                        id="lastName2" 
+                        name="lastName2" 
+                        pInputText
+                        [(ngModel)]="customer.lastName2"
+                        required />
+                    <small class="p-error block" *ngIf="submitted && !customer.lastName2">Last Name is required.</small>
+                </div>
+                <div class="field col-12 md:col-6">
+                    <label for="phone2">Phone</label>
+                    <p-inputMask 
+                        mask="(999) 999-9999" 
+                        id="phone2" 
+                        [(ngModel)]="customer.phone2">
+                    </p-inputMask>
+                </div>
+        
+                <div class="field col-12 md:col-6">
+                    <label for="email2">Email</label>
+                    <input 
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        type="text" 
+                        id="email2" 
+                        name="email2" 
+                        pInputText
+                        [(ngModel)]="customer.email2" />
+                    <small class="p-error block" *ngIf="submitted && invalidEmail2">Invalid email address.</small>
+                </div>
+
+                <div class="field col-12 md:col-12 text-center surface-ground p-2 font-semibold text-lg text-primary">Address</div>
+                <div class="field col-12 md:col-12">
+                    <label for="address">Address</label>
+                    <input 
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        type="text" 
+                        id="address" 
+                        name="address" 
+                        pInputText
+                        [(ngModel)]="customer.address" 
+                        required />
+                    <small class="p-error block" *ngIf="submitted && !customer.address">Address is required.</small>
+                </div>
+                <div class="field col-12 md:col-5">
+                    <label for="city">City</label>
+                    <input 
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        type="text" 
+                        id="city" 
+                        pInputText 
+                        [(ngModel)]="customer.city" 
+                        required />
+                    <small class="p-error block" *ngIf="submitted && !customer.city">City is required.</small>
+                </div>
+                <div class="field col-12 md:col-3">
+                    <label for="state">State</label>
+                    <select id="state" 
+                        [(ngModel)]="customer.state" 
+                        required
+                        class="w-full text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round outline-none focus:border-primary" style="appearance: auto">
+                        <option value="WA">Washington</option>
+                        <option value="OR">Oregon</option>
+                        <option value="ID">Idaho</option>
+                        <option value="MT">Montana</option>
+                    </select>
+                </div>
+                <div class="field col-12 md:col-4">
+                    <label for="postalCode">Postal Code</label>
+                    <input 
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                        type="text" 
+                        id="postalCode" 
+                        pInputText 
+                        [(ngModel)]="customer.zipCode" 
+                        required />
+                    <small class="p-error block" *ngIf="submitted && !customer.zipCode">Postal code is required.</small>
+                </div>
+        
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="validateForm()"></button>
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog 
+    [(visible)]="viewCustomerDialog" 
+    [style]="{width: '600px'}" 
+    header="Customer Details" 
+    [modal]="true"
+    styleClass="p-fluid formgrid">
+
+    <ng-template pTemplate="content">
+        <div class="card">
+            <div class="formgrid grid">
+                <div class="field col-12 md:col-12 text-center text-lg">
+                    <label>{{customer.displayName}}</label>
+                </div>
+
+                <div class="field col-12 md:col-12 text-center surface-ground p-2 font-semibold text-lg text-primary">Primary Contact</div>
+                <div class="field col-12 md:col-6 text-right text-lg">
+                    {{customer.firstName}} {{customer.lastName}}
+                </div>
+                <div class="field col-12 md:col-6 text-lg">
+                    {{customer.phone1}}
+                    <p style="margin-top: .5em;"><a class="text-800" href="mailto:{{customer.email1}}">{{customer.email1}}</a></p>
+                </div>
+
+                <div class="field col-12 md:col-12 text-center surface-ground p-2 font-semibold text-lg text-primary">Secondary Contact</div>
+                <div class="field col-12 md:col-6 text-right text-lg">
+                    {{customer.firstName2}} {{customer.lastName2}}
+                </div>
+                <div class="field col-12 md:col-6 text-lg">
+                    {{customer.phone2}}
+                    <p style="margin-top: .5em;"><a class="text-800" href="mailto:{{customer.email2}}">{{customer.email2}}</a></p>
+                </div>
+                <div class="field col-12 md:col-12 text-center surface-ground p-2 font-semibold text-lg text-primary">Address</div>
+                <div class="field col-12 md:col-12 text-center text-lg">
+                    {{customer.address}}<br/>
+                    {{customer.city}} {{customer.state}}, {{customer.zipCode}}
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Close" icon="pi pi-times" class="p-button-text" (click)="hideViewDialog()"></button>
+    </ng-template>
+
+</p-dialog>

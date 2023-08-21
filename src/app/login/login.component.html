@@ -1,0 +1,87 @@
+<div class="min-h-full bgImg">
+    <p-toast></p-toast>
+<!--    <div class="bg-text">Project Estimator</div> -->
+    <div class="loginForm">
+        <p-card 
+            header="Project Estimator" 
+            subheader="" 
+            class="loginForm">
+            <ng-template pTemplate="header">
+                <img alt="RNJ" src="../../assets/images/RNJRedBGClear.png" class="p-5">
+            </ng-template>
+            <ng-template pTemplate="body">
+                <div class="field grid">
+                    <label for="emailAddress" class="col-fixed" style="width:150px">Email Address</label>
+                    <div class="col">
+                        <input 
+                            pInputText 
+                            autofocus
+                            id="emailAddress" 
+                            type="text" 
+                            [(ngModel)]="emailAddress" 
+                            placeholder="" 
+                            style="margin-right: .5em; width:300px">
+                        <small class="p-error block mt-2" *ngIf="submitted && !emailAddress">Email address is required.</small>
+                    </div>
+                </div>
+                <div class="field grid">
+                    <label for="password" class="col-fixed" style="width:150px">Password</label>
+                    <div class="col:12 md:col-6">
+                        <input 
+                            id="password" 
+                            type="password" 
+                            [(ngModel)]="pwd"
+                            (keyup)="handleKeyUp($event)"
+                            class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary col-fixed" style="width: 300px;">
+                        <small class="p-error block mt-2" *ngIf="submitted && !pwd">Password is required.</small>
+                    </div>
+                </div>
+        
+            </ng-template>
+            
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Login"[disabled]="!emailAddress || !pwd" icon="pi pi-check" class="p-button-text" (click)="login()"></button>
+            </ng-template>
+        </p-card>
+        <!--
+        <p-panel>
+            <ng-template pTemplate="header"> 
+                <span class="text-primary font-semibold text-xl p-panel-titlebar">Project Estimator</span>
+            </ng-template>
+            <div class="field grid">
+                <label for="emailAddress" class="col-fixed" style="width:150px">Email Address</label>
+                <div class="col">
+                    <input 
+                        pInputText 
+                        autofocus
+                        id="emailAddress" 
+                        type="text" 
+                        [(ngModel)]="emailAddress" 
+                        placeholder="john@company.com" 
+                        style="margin-right: .5em; width:300px">
+                    <small class="p-error block mt-2" *ngIf="submitted && !emailAddress">Email address is required.</small>
+                </div>
+            </div>
+            <div class="field grid">
+                <label for="password" class="col-fixed" style="width:150px">Password</label>
+                <div class="col:12 md:col-6">
+                    <input 
+                        id="password" 
+                        type="password" 
+                        [(ngModel)]="pwd"
+                        (keyup)="handleKeyUp($event)"
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary col-fixed" style="width: 300px;">
+                    <small class="p-error block mt-2" *ngIf="submitted && !pwd">Password is required.</small>
+                    </div>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Login"[disabled]="!emailAddress || !pwd" icon="pi pi-check" class="p-button-text" (click)="login()"></button>
+            </ng-template>
+        </p-panel>
+    -->
+    </div>
+    <div class="mma-logo">
+        <img src="../../assets/images/MMA_Circle_Logo-sky.png" width="200px"/>
+    </div>
+    
+</div>
